@@ -11,5 +11,20 @@ pipeline {
         stash(name: 'compiled-results', includes: 'sources/*.py*')
       }
     }
+    stage('Test') {
+      steps {
+        sh '''
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install pytest
+          pytest --junit-xml test-reports/results.xml sources/test_calc.py
+        '''
+      }
+      post {
+        always {
+          junit 'test-reports/results.xml'
+        }
+      }
+    }
   }
 }
